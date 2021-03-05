@@ -185,8 +185,8 @@ history = model_relu.fit(BaseX_train,
                          epochs=epochs,
                          validation_data=(BaseX_val, BaseY_val))
 evaluate_results = model_relu.evaluate(X_test, Y_test, batch_size=batch_size)
-print('Loss: {:.2f}'.format(evaluate_results[0]))
-print('Accuracy: {:.2f}'.format(evaluate_results[1]))
+print('Model relu - Loss: {:.2f}'.format(evaluate_results[0]))
+print('Model relu - Accuracy: {:.2f}'.format(evaluate_results[1]))
 #----------------------------------------------------------------------------------------
 
 
@@ -201,6 +201,11 @@ print('Accuracy: {:.2f}'.format(evaluate_results[1]))
 
 
 #--------------------------Impelment your code here:-------------------------------------
+new_a_model = Sequential(name='new_a_model')
+new_a_model.add(Flatten(input_shape=(32, 32, 1)))
+new_a_model.add(Dense(FIRST_HIDDEN_LAYER, activation='sigmoid', kernel_initializer='he_normal'))
+new_a_model.add(Dense(SECOND_HIDDEN_LAYER, activation='sigmoid', kernel_initializer='he_normal'))
+new_a_model.add(Dense(CLASSIFICATION_LAYER, activation='softmax'))
 
 #----------------------------------------------------------------------------------------
 
@@ -236,7 +241,15 @@ AdamOpt = Adam(lr=learn_rate,decay=decay)
 
 
 #--------------------------Impelment your code here:-------------------------------------
-
+new_a_model.compile(optimizer=AdamOpt, loss='categorical_crossentropy', metrics=['accuracy'])
+history = new_a_model.fit(BaseX_train,
+                         BaseY_train,
+                         batch_size=batch_size,
+                         epochs=epochs,
+                         validation_data=(BaseX_val, BaseY_val))
+evaluate_results = new_a_model.evaluate(X_test, Y_test, batch_size=batch_size)
+print('Model sigmoid - 25 epchos Loss: {:.2f}'.format(evaluate_results[0]))
+print('Model sigmoid - 25 epchos Accuracy: {:.2f}'.format(evaluate_results[1]))
 #-----------------------------------------------------------------------------------------
 
 
@@ -258,7 +271,15 @@ AdamOpt = Adam(lr=learn_rate,decay=decay)
 
 
 #--------------------------Impelment your code here:-------------------------------------
-
+new_a_model.compile(optimizer=AdamOpt, loss='categorical_crossentropy', metrics=['accuracy'])
+history = new_a_model.fit(BaseX_train,
+                         BaseY_train,
+                         batch_size=batch_size,
+                         epochs=epochs,
+                         validation_data=(BaseX_val, BaseY_val))
+evaluate_results = new_a_model.evaluate(X_test, Y_test, batch_size=batch_size)
+print('Model sigmoid - 40 epchos Loss: {:.2f}'.format(evaluate_results[0]))
+print('Model sigmoid - 40 epchos Accuracy: {:.2f}'.format(evaluate_results[1]))
 #-----------------------------------------------------------------------------------------
 
 
@@ -279,7 +300,11 @@ keras.backend.clear_session()
 
 
 #--------------------------Impelment your code here:-------------------------------------
-
+model_relu = Sequential(name='model_relu')
+model_relu.add(Flatten(input_shape=(32, 32, 1)))
+model_relu.add(Dense(FIRST_HIDDEN_LAYER, activation='relu', kernel_initializer='he_normal'))
+model_relu.add(Dense(SECOND_HIDDEN_LAYER, activation='relu', kernel_initializer='he_normal'))
+model_relu.add(Dense(CLASSIFICATION_LAYER, activation='softmax'))
 #----------------------------------------------------------------------------------------
 
 
@@ -290,14 +315,22 @@ batch_size = 32
 epochs = 50
 
 #Define your optimizar parameters:
-AdamOpt = Adam(lr=learn_rate,decay=decay)
+AdamOpt = Adam(lr=learn_rate, decay=decay)
 
 
 # In[ ]:
 
 
 #--------------------------Impelment your code here:-------------------------------------
-
+model_relu.compile(optimizer=AdamOpt, loss='categorical_crossentropy', metrics=['accuracy'])
+history = model_relu.fit(BaseX_train,
+                         BaseY_train,
+                         batch_size=batch_size,
+                         epochs=epochs,
+                         validation_data=(BaseX_val, BaseY_val))
+evaluate_results = model_relu.evaluate(X_test, Y_test, batch_size=batch_size)
+print('Model relu 32 batch size - Loss: {:.2f}'.format(evaluate_results[0]))
+print('Model relu 32 batch size - Accuracy: {:.2f}'.format(evaluate_results[1]))
 #----------------------------------------------------------------------------------------
 
 
@@ -318,7 +351,13 @@ keras.backend.clear_session()
 
 
 #--------------------------Impelment your code here:-------------------------------------
-
+new_a_model = Sequential(name='new_a_model')
+new_a_model.add(Flatten(input_shape=(32, 32, 1)))
+new_a_model.add(Dense(FIRST_HIDDEN_LAYER, activation='sigmoid', kernel_initializer='he_normal'))
+new_a_model.add(BatchNormalization())
+new_a_model.add(Dense(SECOND_HIDDEN_LAYER, activation='sigmoid', kernel_initializer='he_normal'))
+new_a_model.add(BatchNormalization())
+new_a_model.add(Dense(CLASSIFICATION_LAYER, activation='softmax'))
 #---------------------------------------------------------------------------------------
 
 
@@ -338,7 +377,15 @@ AdamOpt = Adam(lr=learn_rate,decay=decay)
 
 #Preforming the training by using fit 
 #--------------------------Impelment your code here:-------------------------------------
-
+new_a_model.compile(optimizer=AdamOpt, loss='categorical_crossentropy', metrics=['accuracy'])
+history = new_a_model.fit(BaseX_train,
+                         BaseY_train,
+                         batch_size=batch_size,
+                         epochs=epochs,
+                         validation_data=(BaseX_val, BaseY_val))
+evaluate_results = new_a_model.evaluate(X_test, Y_test, batch_size=batch_size)
+print('Model sigmoid - Batch normlization Loss: {:.2f}'.format(evaluate_results[0]))
+print('Model sigmoid - Batch normlization Accuracy: {:.2f}'.format(evaluate_results[1]))
 #----------------------------------------------------------------------------------------
 
 
@@ -408,14 +455,10 @@ epochs = 25
 drop = True
 dropRate = 0.3
 reg = 1e-2
-NNet = get_net(input_shape,drop,dropRate,reg)
-
 
 # In[ ]:
 
-
 NNet=get_net(input_shape,drop,dropRate,reg)
-
 
 # In[ ]:
 
@@ -465,7 +508,59 @@ print('test loss, test acc:', results)
 
 
 #--------------------------Impelment your code here:-------------------------------------
+def get_net(input_shape,drop,dropRate,reg, filters):
+    #Defining the network architecture:
+    model = Sequential()
+    model.add(Permute((1,2,3),input_shape = input_shape))
+    model.add(Conv2D(filters=filters[0], kernel_size=(3,3), padding='same', activation='relu',name='Conv2D_1',kernel_regularizer=regularizers.l2(reg)))
+    if drop:
+        model.add(Dropout(rate=dropRate))
+    model.add(BatchNormalization(axis=1))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
+    model.add(Conv2D(filters=filters[1], kernel_size=(3,3), padding='same', activation='relu',name='Conv2D_2',kernel_regularizer=regularizers.l2(reg)))
+    if drop:
+        model.add(Dropout(rate=dropRate))
+    model.add(BatchNormalization(axis=1))
+    model.add(Conv2D(filters=filters[2], kernel_size=(3,3), padding='same', activation='relu',name='Conv2D_3',kernel_regularizer=regularizers.l2(reg)))
+    if drop:
+        model.add(Dropout(rate=dropRate))
+    model.add(BatchNormalization(axis=1))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
+    model.add(Conv2D(filters=filters[3], kernel_size=(3,3), padding='same', activation='relu',name='Conv2D_4',kernel_regularizer=regularizers.l2(reg)))
+    if drop:
+        model.add(Dropout(rate=dropRate))
+    model.add(BatchNormalization(axis=1))
+    model.add(Conv2D(filters=filters[4], kernel_size=(3,3), padding='same', activation='relu',name='Conv2D_5',kernel_regularizer=regularizers.l2(reg)))
+    if drop:
+        model.add(Dropout(rate=dropRate))
+    model.add(BatchNormalization(axis=1))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
+    model.add(Flatten())
+    #Fully connected network tail:
+    model.add(Dense(512, activation='elu',name='FCN_1'))
+    if drop:
+        model.add(Dropout(rate=dropRate))
+    model.add(Dense(128, activation='elu',name='FCN_2'))
+    model.add(Dense(4, activation= 'softmax',name='FCN_3'))
+    model.summary()
+    return model
 
+
+filters = np.array([32, 64, 64, 128, 128])
+NNet = get_net(input_shape, drop, dropRate, reg, filters)
+
+from tensorflow.keras.optimizers import *
+import os
+from tensorflow.keras.callbacks import *
+
+#Defining the optimizar parameters:
+AdamOpt = Adam(lr=learn_rate, decay=decay)
+
+#Compile the network:
+NNet.compile(optimizer=AdamOpt, metrics=['acc'], loss='categorical_crossentropy')
+h = NNet.fit(x=BaseX_train, y=BaseY_train, batch_size=batch_size, epochs=epochs, verbose=1, validation_split=0, validation_data = (BaseX_val, BaseY_val), shuffle=True)
+results = NNet.evaluate(X_test,Y_test)
+print('smaller filters: test loss, test acc:', results)
 #----------------------------------------------------------------------------------------
 
 
