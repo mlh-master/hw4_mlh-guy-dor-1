@@ -40,7 +40,7 @@ os.environ["CUDA_VISIBLE_DEVICES"]="2"
 
 
 # In[ ]:
-*
+
 
 import tensorflow as tf
 config = tf.compat.v1.ConfigProto(gpu_options =
@@ -140,7 +140,15 @@ keras.backend.clear_session()
 
 
 #--------------------------Impelment your code here:-------------------------------------
+FIRST_HIDDEN_LAYER = 300
+SECOND_HIDDEN_LAYER = 150
+CLASSIFICATION_LAYER = 4
 
+model_relu = Sequential(name='model_relu')
+model_relu.add(Flatten(input_shape=(32, 32, 1)))
+model_relu.add(Dense(FIRST_HIDDEN_LAYER, activation='relu', kernel_initializer='he_normal'))
+model_relu.add(Dense(SECOND_HIDDEN_LAYER, activation='relu', kernel_initializer='he_normal'))
+model_relu.add(Dense(CLASSIFICATION_LAYER, activation='softmax'))
 #----------------------------------------------------------------------------------------
 
 
@@ -170,7 +178,15 @@ AdamOpt = Adam(lr=learn_rate,decay=decay)
 
 
 #--------------------------Impelment your code here:-------------------------------------
-
+model_relu.compile(optimizer=AdamOpt, loss='categorical_crossentropy', metrics=['accuracy'])
+history = model_relu.fit(BaseX_train,
+                         BaseY_train,
+                         batch_size=batch_size,
+                         epochs=epochs,
+                         validation_data=(BaseX_val, BaseY_val))
+evaluate_results = model_relu.evaluate(X_test, Y_test, batch_size=batch_size)
+print('Loss: {:.2f}'.format(evaluate_results[0]))
+print('Accuracy: {:.2f}'.format(evaluate_results[1]))
 #----------------------------------------------------------------------------------------
 
 
